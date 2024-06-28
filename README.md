@@ -1,6 +1,11 @@
 clone -> create .env.local in your root dir -> paste your env vairables in .env.local -> npm run dev
 
- .env.local
+
+
+## sample config 
+
+
+.env.local
 
 SMTP Configuration
 
