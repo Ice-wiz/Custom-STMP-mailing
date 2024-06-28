@@ -1,5 +1,3 @@
-// pages/api/send-email.js
-
 import nodemailer from 'nodemailer';
 import { MongoClient } from 'mongodb';
 
@@ -10,7 +8,7 @@ export default async function handler(req, res) {
         return res.status(405).send('Method Not Allowed');
     }
 
-    const { smtpUser, smtpPass, recipient, subject, body } = req.body;
+    const { recipient, subject, body } = req.body;
 
     // Generate a unique reference code
     const referenceCode = `REF-${Date.now()}`;
@@ -18,20 +16,20 @@ export default async function handler(req, res) {
     // Append reference code to the subject
     const subjectWithRef = `${subject} [${referenceCode}]`;
 
-    // Create SMTP transporter with user's credentials
+    // Create SMTP transporter with environment variables
     let transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
         secure: false, // false for STARTTLS
         auth: {
-            user: smtpUser,
-            pass: smtpPass
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
         }
     });
 
     // Email options
     let mailOptions = {
-        from: `"Your Name" <${smtpUser}>`, // Sender address
+        from: `"Your Name" <${process.env.SMTP_USER}>`, // Sender address
         to: recipient, // List of recipients
         subject: subjectWithRef, // Subject line
         text: body, // Plain text body
@@ -48,7 +46,7 @@ export default async function handler(req, res) {
         const collection = db.collection('sentEmails');
         
         await collection.insertOne({
-            smtpUser,
+            smtpUser: process.env.SMTP_USER,
             recipient,
             subject: subjectWithRef,
             body,
@@ -59,6 +57,7 @@ export default async function handler(req, res) {
 
         res.status(200).json({ message: 'Email sent', info });
     } catch (error) {
+        console.error('Error sending email:', error); // Log the error
         res.status(500).json({ message: 'Error sending email', error: error.message });
     }
 }
