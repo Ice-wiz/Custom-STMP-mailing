@@ -1,9 +1,12 @@
+
 import { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 
+
 export default function SendEmail() {
     const [recipient, setRecipient] = useState('');
+    const [senderName, setSenderName] = useState(''); // Already present
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
     const [status, setStatus] = useState('');
@@ -14,6 +17,7 @@ export default function SendEmail() {
 
         try {
             const response = await axios.post('/api/send-email', {
+                senderName,
                 recipient,
                 subject,
                 body
@@ -29,6 +33,16 @@ export default function SendEmail() {
             <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg">
                 <h1 className="text-3xl font-bold mb-6 text-center">Send Email</h1>
                 <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">Sender Name:</label>
+                        <input
+                            type="text"
+                            value={senderName}
+                            onChange={(e) => setSenderName(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                    </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Recipient Email:</label>
                         <input

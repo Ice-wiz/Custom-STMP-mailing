@@ -8,7 +8,8 @@ export default async function handler(req, res) {
         return res.status(405).send('Method Not Allowed');
     }
 
-    const { recipient, subject, body } = req.body;
+    const { recipient, subject, body , senderName } = req.body;
+    console.log(senderName)
 
     // Generate a unique reference code
     const referenceCode = `REF-${Date.now()}`;
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
 
     // Email options
     let mailOptions = {
-        from: `"Your Name" <${process.env.SMTP_USER}>`, // Sender address
+        from: `"${senderName}" <${process.env.SMTP_USER}>`, // Sender address
         to: recipient, // List of recipients
         subject: subjectWithRef, // Subject line
         text: body, // Plain text body
@@ -47,6 +48,7 @@ export default async function handler(req, res) {
         
         await collection.insertOne({
             smtpUser: process.env.SMTP_USER,
+            senderName,
             recipient,
             subject: subjectWithRef,
             body,
