@@ -1,14 +1,14 @@
 import nodemailer from 'nodemailer';
 import { MongoClient } from 'mongodb';
 
-const clientPromise = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+const clientPromise = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true ,serverSelectionTimeoutMS: 5000}).connect();
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).send('Method Not Allowed');
     }
 
-    const { recipient, subject, body , senderName } = req.body;
+    const { recipient, subject, body , senderName , smtpUser , smtpPass , host , smtpPort } = req.body;
     console.log(senderName)
 
     // Generate a unique reference code
@@ -19,18 +19,18 @@ export default async function handler(req, res) {
 
     // Create SMTP transporter with environment variables
     let transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
+        host: host,
+        port: smtpPort,
         secure: false, // false for STARTTLS
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
+            user: smtpUser,
+            pass: smtpPass
         }
     });
 
     // Email options
     let mailOptions = {
-        from: `"${senderName}" <${process.env.SMTP_USER}>`, // Sender address
+        from: `"${senderName}" <${smtpUser}>`, // Sender address
         to: recipient, // List of recipients
         subject: subjectWithRef, // Subject line
         text: body, // Plain text body
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         const collection = db.collection('sentEmails');
         
         await collection.insertOne({
-            smtpUser: process.env.SMTP_USER,
+            smtpUser: smtpUser,
             senderName,
             recipient,
             subject: subjectWithRef,

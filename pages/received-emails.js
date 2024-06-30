@@ -6,6 +6,7 @@ const ReceivedEmails = () => {
     const [emails, setEmails] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    localStorage.getItem('user');
 
     useEffect(() => {
         const fetchEmails = async () => {
@@ -23,8 +24,9 @@ const ReceivedEmails = () => {
         fetchEmails();
     }, []);
 
+
     return (
-        <div className="min-h-screen bg-slate-100 flex flex-col items-center py-8">
+        <div className="min-h-screen bg-gradient-to-r from-blue-500 to-green-400 flex flex-col items-center py-8">
             <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-4xl relative">
                 
                 <Link href="/" passHref>
